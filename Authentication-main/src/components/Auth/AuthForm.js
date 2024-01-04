@@ -15,42 +15,55 @@ const AuthForm = () => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    const enterdEmail = emailInputRef.current.value;
-    const enterdPassword = passwordInputRef.current.value;
+    const enteredEmail = emailInputRef.current.value;
+    const enteredPassword = passwordInputRef.current.value;
 
     setIsLoading(true);
+    let url;
     if (isLogin) {
+      url ="https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyA8Uvdj7Lw5usuu4YQ-5EXSC4KGgkZXCv4";
+
     } else {
-      fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=AIzaSyA8Uvdj7Lw5usuu4YQ-5EXSC4KGgkZXCv4",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: enterdEmail,
-            password: enterdPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "content-type": "application/json",
-          },
-        }
-      ).then((res) => {
+      
+        url ="https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyA8Uvdj7Lw5usuu4YQ-5EXSC4KGgkZXCv4";
+    }
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        email: enteredEmail,
+        password: enteredPassword,
+        returnSecureToken: true,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
         setIsLoading(false);
         if (res.ok) {
           // ..
+          return res.json();
         } else {
-          res.json().then((data) => {
-            // show an error modal
-            let errorMessage = "Authentication failed!";
-            // if (data && data.error && data.error.message) {
-            //   errorMessage = data.error.errorMessage;
-            // }
-            alert(errorMessage);
+          return res.json().then((data) => {
+            let errorMessage = "Authentication Failed !";
+            /*if (data && data.error && data.error.message) {
+            errorMessage = data.error.message;
+          }*/
+            throw new Error(errorMessage);
           });
         }
+      })
+      .then((data) => {
+        
+        console.log(data)
+      })
+      .catch((err) => {
+        alert(err.message);
       });
-    }
-  };
+         
+        }
+    
+    
+
 
   return (
     <section className={classes.auth}>
@@ -69,12 +82,16 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
+        {!isLoading && (
+            <button>{isLogin ? "Login" : "Create Account"}</button>
+          )}
+          {isLoading && <p>Sending Request...</p>}
           <button
-            type='button'
+            type="button"
             className={classes.toggle}
             onClick={switchAuthModeHandler}
           >
-            {isLogin ? 'Create new account' : 'Login with existing account'}
+            {isLogin ? "Create new account" : "Login with existing account"}
           </button>
         </div>
       </form>
