@@ -11,7 +11,7 @@ export const AuthContextProvider = (props) => {
   const initialToken = localStorage.getItem("token");
   const [token, setToken] = useState(initialToken);
   const userIsLoggedIn = !!token;
-  
+
   const loginHandler = (token) => {
     setToken(token);
     localStorage.setItem("token", token);
@@ -20,14 +20,15 @@ export const AuthContextProvider = (props) => {
     setToken(null);
     localStorage.removeItem("token");
   };
-
+    
+  // Auto logout functionality
   useEffect(() => {
     let timer;
     const resetTimer = () => {
       clearTimeout(timer);
       timer = setTimeout(() => {
         logoutHandler();
-      }, 60 * 1000);
+      },60 * 1000);
     };
     const events = [
       "mousedown",
